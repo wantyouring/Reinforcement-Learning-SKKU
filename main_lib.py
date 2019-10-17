@@ -1,3 +1,5 @@
+#-*- coding:utf-8 -*-
+
 import numpy as np
 
 def policy_evaluation(env, policy, gamma=0.99, theta=1e-8):
