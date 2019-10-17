@@ -11,7 +11,6 @@ def policy_evaluation(env, policy, gamma=0.99, theta=1e-8):
 
     while True:
         delta = 0
-        #V_k1 = np.zeros(env.nS)
         for state_i in range(env.nS):
             sum = 0
             for action in range(env.nA):
@@ -33,18 +32,14 @@ def policy_improvement(env, V, gamma=0.99):
     # policy(s) = ([s->s'으로 a를 통해 갈 확률] * ([s->s'으로 a를 통해 갔을 때 reward] + gamma * V[s']))를 a별로 모든 s'들에 대해 더해서 최대가 되는 a 구하기.
 
     for state_i in range(env.nS):
-        max = 0
+        sum = np.zeros(4)
         for action in range(env.nA):
-            sum = 0
             for i in range(len(env.MDP[state_i][action])):
                 p = env.MDP[state_i][action][i][0]
                 r = env.MDP[state_i][action][i][2]
                 v = V[env.MDP[state_i][action][i][1]]
-                sum += p * (r + gamma * v)
-            if max < sum:
-                good_a = action
-                max = sum
-        policy[state_i][good_a] = 1
+                sum[action] += p * (r + gamma * v)
+        policy[state_i][sum.argmax()] = 1
 
     return policy
 
