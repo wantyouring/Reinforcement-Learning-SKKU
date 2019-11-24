@@ -57,25 +57,25 @@ class DQN:
         # mini batch를 받아 policy를 update
         mini_batch = random.sample(self.replay_buffer,MINI_BATCH) # (MINI_BATCH,5) s,a,r,n,d
         states = np.vstack([ele[0] for ele in mini_batch]) # (32,2)
-        actions = np.array([ele[1] for ele in mini_batch]) # (32)
-        rewards = np.array([ele[2] for ele in mini_batch])  # (32)
-        next_states = np.vstack([ele[3] for ele in mini_batch])  # (32,2)
-        dones = np.array([ele[4] for ele in mini_batch]) # (32)
-        #print("{},{},{}".format(np.shape(states),np.shape(next_states),np.shape(rewards)))
-
-        # target_ys = rewards + DISCOUNT_RATE * np.amax(self.target_Q.predict_on_batch(next_states)) * ~dones # (32)
-        target_ys = rewards + DISCOUNT_RATE * np.max(self.target_Q.predict_on_batch(next_states), axis=1) * ~dones  # (32)
-        ys = self.main_Q.predict_on_batch(states) # (32,3)
-
-        ys = ys.numpy()
-
-        # print("target_ys:{}\nys:{}".format(target_ys,ys))
-
-        # actions[i]에 해당하는 ys[i]의 index들에 target_ys[i] 넣기.
-        ys[np.arange(len(states)),actions] = target_ys
-        self.main_Q.train_on_batch(states,ys)
-        # self.main_Q.fit(states,ys,verbose=0)
-        return
+        # actions = np.array([ele[1] for ele in mini_batch]) # (32)
+        # rewards = np.array([ele[2] for ele in mini_batch])  # (32)
+        # next_states = np.vstack([ele[3] for ele in mini_batch])  # (32,2)
+        # dones = np.array([ele[4] for ele in mini_batch]) # (32)
+        # #print("{},{},{}".format(np.shape(states),np.shape(next_states),np.shape(rewards)))
+        #
+        # # target_ys = rewards + DISCOUNT_RATE * np.amax(self.target_Q.predict_on_batch(next_states)) * ~dones # (32)
+        # target_ys = rewards + DISCOUNT_RATE * np.max(self.target_Q.predict_on_batch(next_states), axis=1) * ~dones  # (32)
+        # ys = self.main_Q.predict_on_batch(states) # (32,3)
+        #
+        # ys = ys.numpy()
+        #
+        # # print("target_ys:{}\nys:{}".format(target_ys,ys))
+        #
+        # # actions[i]에 해당하는 ys[i]의 index들에 target_ys[i] 넣기.
+        # ys[np.arange(len(states)),actions] = target_ys
+        # self.main_Q.train_on_batch(states,ys)
+        # # self.main_Q.fit(states,ys,verbose=0)
+        # return
 
         # y_save = []
         #
@@ -95,15 +95,16 @@ class DQN:
         # # self.main_Q.fit(states,y_save,batch_size=32,verbose=0) # mini_batch transition들로 main_Q fitting하기.  (?)model fit이 buffer 전체 넘겨줘서 학습해야하나? 현재 너무 오래걸림
         # return
 
-        # for state, action, reward, next_state, done in mini_batch: # for문 numpy 계산으로 속도 늘리기.
-        #     if done:
-        #         target_y = reward
-        #     else:
-        #         target_y = reward + DISCOUNT_RATE * np.amax(self.target_Q.predict(np.reshape(next_state,(1,2))))
-        #     y = self.main_Q.predict(np.reshape(state,(1,2)))
-        #     y[0][action] = target_y
-        #     self.main_Q.fit(np.reshape(state,(1,2)),y,verbose=0) # mini_batch transition들로 main_Q fitting하기.
-        # return
+        for state, action, reward, next_state, done in mini_batch: # for문 numpy 계산으로 속도 늘리기.
+            if done:
+                target_y = reward
+            else:
+                target_y = reward + DISCOUNT_RATE * np.amax(self.target_Q.predict_on_batch(np.reshape(next_state,(1,2))))
+            y = self.main_Q.predict_on_batch(np.reshape(state,(1,2)))
+            y = y.numpy()
+            y[0][action] = target_y
+            self.main_Q.train_on_batch(np.reshape(state,(1,2)),y) # mini_batch transition들로 main_Q fitting하기.
+        return
 
     def update_epsilon(self, ) :
         # Exploration 시 사용할 epsilon 값을 업데이트
