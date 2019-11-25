@@ -99,7 +99,13 @@ class DQN:
             if done:
                 target_y = reward
             else:
-                target_y = reward + DISCOUNT_RATE * np.amax(self.target_Q.predict_on_batch(np.reshape(next_state,(1,2))))
+                # Double DQN
+                if self.double_q:
+                    action_from_main = np.argmax(self.main_Q.predict_on_batch(np.reshape(next_state,(1,2))))
+                    target_y = reward + DISCOUNT_RATE * self.target_Q.predict_on_batch(np.reshape(next_state,(1,2)))[0][action_from_main]
+                # DQN
+                else:
+                    target_y = reward + DISCOUNT_RATE * np.amax(self.target_Q.predict_on_batch(np.reshape(next_state,(1,2))))
             y = self.main_Q.predict_on_batch(np.reshape(state,(1,2)))
             y = y.numpy()
             y[0][action] = target_y
@@ -172,10 +178,10 @@ class DQN:
 
                 # if start_learn:
                 if self.total_step > 5000: # 랜덤으로 좀 돌고 학습하기.
-                    if self.total_step%50 == 0:
+                    if self.total_step%200 == 0:
                         self.target_Q.set_weights(self.main_Q.get_weights())
                     # 일정 step마다 train
-                    if self.total_step%10 == 0:
+                    if self.total_step%50 == 0: # 한 번 train시 32(mini batch size만큼)번씩 학습함.
                         self.train_minibatch()  # step마다 미니배치 학습시키기. (에피소드마다로 바꿀지 테스트해보기.)
 
                 state = next_state
