@@ -7,32 +7,37 @@ from dqn import DQN
 
 default, double, multistep, per = False, False, False, False
 
-if len(sys.argv) == 1:
-    # Default DQN
-    print("There is no argument, please input")
-
-for i in range(1,len(sys.argv)):
-    if sys.argv[i] == "default":
-        default = True
-    elif sys.argv[i] == "double":
-        double = True
-    elif sys.argv[i] == "multistep":
-        multistep = True
-    elif sys.argv[i] == "per":
-        per = True
+# if len(sys.argv) == 1:
+#     # Default DQN
+#     print("There is no argument, please input")
+#
+# for i in range(1,len(sys.argv)):
+#     if sys.argv[i] == "default":
+#         default = True
+#     elif sys.argv[i] == "double":
+#         double = True
+#     elif sys.argv[i] == "multistep":
+#         multistep = True
+#     elif sys.argv[i] == "per":
+#         per = True
 
 env = gym.make('MountainCar-v0')
 
-if default:
-    env.reset()
-    dqn = DQN(env, double_q=False, per=False, multistep=False)
-    defaults = dqn.learn(1500)
-    del dqn
+default = True
+double = True
+multistep = True
+
 if double:
     env.reset()
     dqn = DQN(env, double_q=True, per=False, multistep=False)
     doubles = dqn.learn(1500)
     del dqn
+if default:
+    env.reset()
+    dqn = DQN(env, double_q=False, per=False, multistep=False)
+    defaults = dqn.learn(1500)
+    del dqn
+
 if multistep:
     env.reset()
     dqn = DQN(env, double_q=False, per=False, multistep=True)
