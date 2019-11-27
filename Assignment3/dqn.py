@@ -11,7 +11,7 @@ DISCOUNT_RATE = 0.99            # gamma parameter
 REPLAY_MEMORY = 50000           # Replay buffer 의 최대 크기
 LEARNING_RATE = 0.001           # learning rate parameter
 LEARNING_STARTS = 1000          # 1000 스텝 이후 training 시작
-MINI_BATCH = 32
+MINI_BATCH = 64
 
 
 class DQN:
@@ -38,8 +38,8 @@ class DQN:
     def _build_network(self, ):
         # Target 네트워크와 Local 네트워크를 설정
         model = tf.keras.Sequential()
-        model.add(tf.keras.layers.Dense(32, input_dim=self.state_size, activation='relu', kernel_initializer='he_uniform'))
-        model.add(tf.keras.layers.Dense(16, activation='relu'))
+        model.add(tf.keras.layers.Dense(64, input_dim=self.state_size, activation='relu', kernel_initializer='he_uniform'))
+        model.add(tf.keras.layers.Dense(32, activation='relu'))
         model.add(tf.keras.layers.Dense(self.action_size, activation='linear', kernel_initializer='he_uniform'))
         model.compile(loss='mse',optimizer=tf.keras.optimizers.Adam(lr=LEARNING_RATE))
 
