@@ -33,13 +33,13 @@ class DQN:
         self.target_Q.set_weights(self.main_Q.get_weights())
         self.total_step = 0
 
-        self.n_steps = 25 # Multistep(n-step) 구현 시의 n 값
+        self.n_steps = 15 # Multistep(n-step) 구현 시의 n 값
 
     def _build_network(self, ):
         # Target 네트워크와 Local 네트워크를 설정
         model = tf.keras.Sequential()
-        model.add(tf.keras.layers.Dense(64, input_dim=self.state_size, activation='relu', kernel_initializer='he_uniform'))
-        model.add(tf.keras.layers.Dense(32, activation='relu'))
+        model.add(tf.keras.layers.Dense(256, input_dim=self.state_size, activation='relu', kernel_initializer='he_uniform'))
+        model.add(tf.keras.layers.Dense(128, activation='relu'))
         model.add(tf.keras.layers.Dense(self.action_size, activation='linear', kernel_initializer='he_uniform'))
         model.compile(loss='mse',optimizer=tf.keras.optimizers.Adam(lr=LEARNING_RATE))
 
@@ -74,7 +74,7 @@ class DQN:
 
             # target_ys = rewards + DISCOUNT_RATE * np.amax(self.target_Q.predict_on_batch(next_states)) * ~dones # (32)
             # done 고려하기@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-            target_ys = DISCOUNT_RATE ** self.n_steps * np.max(self.target_Q.predict_on_batch(s[self.n_steps-1]), axis=1) + np.sum([DISCOUNT_RATE**i * r[i] for i in range(self.n_steps)], axis=0)
+            target_ys = DISCOUNT_RATE ** self.n_steps * np.max(self.target_Q.predict_on_batch(s[self.n_steps-1]), axis=1) * ~d[self.n_steps-1] + np.sum([DISCOUNT_RATE**i * r[i] * ~d[i] for i in range(self.n_steps-1)], axis=0)
             # target_ys = Q_max
             # # d = np.invert(d) # done상황 계산하기 위해 미리 invert
             # for i in range(2,self.n_steps+1): # r[0~nstep-2]까지. nstep-1은 maxQ계산하였음.
