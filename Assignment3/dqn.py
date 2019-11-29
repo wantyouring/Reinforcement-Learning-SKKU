@@ -33,13 +33,13 @@ class DQN:
         self.target_Q.set_weights(self.main_Q.get_weights())
         self.total_step = 0
 
-        self.n_steps = 15 # Multistep(n-step) 구현 시의 n 값
+        self.n_steps = 10 # Multistep(n-step) 구현 시의 n 값
 
     def _build_network(self, ):
         # Target 네트워크와 Local 네트워크를 설정
         model = tf.keras.Sequential()
-        model.add(tf.keras.layers.Dense(256, input_dim=self.state_size, activation='relu', kernel_initializer='he_uniform'))
-        model.add(tf.keras.layers.Dense(128, activation='relu'))
+        model.add(tf.keras.layers.Dense(512, input_dim=self.state_size, activation='relu', kernel_initializer='he_uniform'))
+        model.add(tf.keras.layers.Dense(256, activation='relu'))
         model.add(tf.keras.layers.Dense(self.action_size, activation='linear', kernel_initializer='he_uniform'))
         model.compile(loss='mse',optimizer=tf.keras.optimizers.Adam(lr=LEARNING_RATE))
 
@@ -165,12 +165,12 @@ class DQN:
                     # reward 위치별로 가중치 주기 추가할지? @@@
                     action = self.predict(state)
                     next_state, reward, done, _ = self.env.step(action)
-                    if done and step_count != 199:  # 성공
-                        reward = 100
-                    elif done:  # 실패
-                        reward = -1
-                    else:
-                        reward = state[0]
+                    # if done and step_count != 199:  # 성공
+                    #     reward = 100
+                    # elif done:  # 실패
+                    #     reward = -1
+                    # else:
+                    #     reward = state[0]
                         # reward = (state[0] + 0.5)**2 # 가운데 -0.5에서 시작해 양쪽으로 갈 수록 reward 제곱으로 증가.
 
                     # if action == 1:  # 정지 action 없애기.
@@ -192,12 +192,12 @@ class DQN:
                     # if done and step_count != 199:
                     #     self.start_learn = True
 
-                    if done and step_count != 199:  # 성공
-                        reward = 100
-                    elif done:  # 실패
-                        reward = -1
-                    else:
-                        reward = state[0]
+                    # if done and step_count != 199:  # 성공
+                    #     reward = 100
+                    # elif done:  # 실패
+                    #     reward = -1
+                    # else:
+                    #     reward = state[0]
                     #reward = (state[0] + 0.5)**2 # 가운데 -0.5에서 시작해 양쪽으로 갈 수록 reward 제곱으로 증가.
 
                     # if action == 1: # 정지 action 없애기.
